@@ -1,5 +1,3 @@
-//AT THE MOMENT ONlY FOR SPECTRE, NOT PUBLIC!
-
 // ==UserScript==
 // @name         AP_CookieClicker
 // @namespace    http://tampermonkey.net/
@@ -19,6 +17,6 @@ const { Client, ITEMS_HANDLING_FLAGS, SERVER_PACKET_TYPE, CREATE_AS_HINT_MODE, C
 'use strict';
 
 const scriptCC = document.createElement('script')
-scriptCC.src = 'https://sommer-alexander.de/cc/APModCookieClicker.js';
+scriptCC.src = 'https://raw.githubusercontent.com/Simik1997/AP_CookieClicker/refs/heads/main/APModCookieClicker.js';
 scriptCC.type = 'text/javascript';
 document.head.append(scriptCC);
