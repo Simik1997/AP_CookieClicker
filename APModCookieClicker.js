@@ -10,8 +10,10 @@
 // @grant        none
 // ==/UserScript==
 
-const { Client, ITEMS_HANDLING_FLAGS, SERVER_PACKET_TYPE, CREATE_AS_HINT_MODE, CLIENT_STATUS, CONNECTION_STATUS, CLIENT_PACKET_TYPE, SetOperationsBuilder } = await import("https://unpkg.com/archipelago.js@1.0.0/dist/archipelago.js");
-'use strict';
+//const { Client, ITEMS_HANDLING_FLAGS, SERVER_PACKET_TYPE, CREATE_AS_HINT_MODE, CLIENT_STATUS, CONNECTION_STATUS, CLIENT_PACKET_TYPE, SetOperationsBuilder } = await import("https://unpkg.com/archipelago.js@1.0.0/dist/archipelago.js");
+//'use strict';
+
+alert("loaded");
 
 //this startet as cookieclicker, but should work as a template for all browsergames
 //therefore code is splitted into Archipelago stuff, and Game specific Stuff
@@ -38,7 +40,7 @@ document.head.append(scriptToast);
 
 // input fields
 const connectionContainer = document.createElement("div");
-const hostname = document.createElement("input");
+const hostname = document.createElement("input");   
 const port = document.createElement("input");
 const name = document.createElement("input");
 const password = document.createElement("input");
