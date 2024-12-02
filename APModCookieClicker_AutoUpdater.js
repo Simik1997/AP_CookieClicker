@@ -7,7 +7,7 @@
 // @match        https://orteil.dashnet.org/cookieclicker/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=dashnet.org
 // @require
-// @grant        none
+// @grant        none 
 // ==/UserScript==
 
 //Install this in your Browser using TamperMonkey
