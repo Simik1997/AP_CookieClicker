@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AP_CookieClicker
 // @namespace    http://tampermonkey.net/
-// @version      2024-10-16
+// @version      2024-12-02
 // @description  Archipelago
 // @author       SX
 // @match        https://orteil.dashnet.org/cookieclicker/
