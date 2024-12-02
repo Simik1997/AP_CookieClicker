@@ -13,10 +13,10 @@
 //Install this in your Browser using TamperMonkey
 //Play on: https://orteil.dashnet.org/cookieclicker/
 
-const { Client, ITEMS_HANDLING_FLAGS, SERVER_PACKET_TYPE, CREATE_AS_HINT_MODE, CLIENT_STATUS, CONNECTION_STATUS, CLIENT_PACKET_TYPE, SetOperationsBuilder } = await import("https://unpkg.com/archipelago.js@1.0.0/dist/archipelago.js");
 'use strict';
 
-const scriptCC = document.createElement('script')
-scriptCC.src = 'https://raw.githubusercontent.com/Simik1997/AP_CookieClicker/refs/heads/main/APModCookieClicker.js';
-scriptCC.type = 'text/javascript';
-document.head.append(scriptCC);
+await import('https://cdn.jsdelivr.net/gh/Simik1997/AP_CookieClicker@latest/APModCookieClicker.js'); //jsdelivr is a cdn for github
+
+//if it doesnt Update, purge the cdn cache
+//https://www.jsdelivr.com/tools/purge
+//Purge > https://cdn.jsdelivr.net/gh/Simik1997/AP_CookieClicker@latest/APModCookieClicker.js

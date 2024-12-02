@@ -10,10 +10,14 @@
 // @grant        none
 // ==/UserScript==
 
-//const { Client, ITEMS_HANDLING_FLAGS, SERVER_PACKET_TYPE, CREATE_AS_HINT_MODE, CLIENT_STATUS, CONNECTION_STATUS, CLIENT_PACKET_TYPE, SetOperationsBuilder } = await import("https://unpkg.com/archipelago.js@1.0.0/dist/archipelago.js");
+//IF YOU DONT LIKE TO USE THE AUTO UPDATER, USE THIS VERSION > UNCOMMENT THE NEXT 2 LINES
+
+
+const { Client, ITEMS_HANDLING_FLAGS, SERVER_PACKET_TYPE, CREATE_AS_HINT_MODE, CLIENT_STATUS, CONNECTION_STATUS, CLIENT_PACKET_TYPE, SetOperationsBuilder } = await import("https://unpkg.com/archipelago.js@1.0.0/dist/archipelago.js");
 //'use strict';
 
-alert("loaded");
+
+console.log("AP CookieClicker loaded");
 
 //this startet as cookieclicker, but should work as a template for all browsergames
 //therefore code is splitted into Archipelago stuff, and Game specific Stuff
@@ -371,8 +375,12 @@ function recieveItem(id, firstTime) {
     } else if (id === 42069483) { //Unlock You
         document.getElementById("product19").style.display = "";
     } else if (id < 42069649) { // UPGRADES
-        Game.UpgradesById[id - checkIdOffset].basePrice = 1;
-        Game.UpgradesById[id - checkIdOffset].buy();
+        Game.UpgradesById[id - checkIdOffset].basePrice = -1;
+        var sucess = Game.UpgradesById[id - checkIdOffset].buy();
+        if(sucess !== 1){
+            //if there is no buy function, set it to bought manual.
+            Game.UpgradesById[id - checkIdOffset].bought=1;
+        }
     } else if (id === 42069649 && firstTime) { // TRAPS  -1 Gebäude
         if (building.amount >= 1) {
             building.amount -= 1;
@@ -569,6 +577,36 @@ function appendFunctions() {
             Game.BigCookieSize=0;
             
             Game.runModHook('reincarnate');
+            
+            //reApply all items
+            //TODO
+            recievedItems.forEach(id => {
+                recieveItem(id, false);
+            });
         }
     }
+
+    Game.computeLumpTimes=function()
+    {
+        var hour=1000*6; //0*60;
+        Game.lumpMatureAge=hour*20;
+        Game.lumpRipeAge=hour*23;
+        if (Game.Has('Stevia Caelestis')) Game.lumpRipeAge-=hour;
+        if (Game.Has('Diabetica Daemonicus')) Game.lumpMatureAge-=hour;
+        if (Game.Has('Ichor syrup')) Game.lumpMatureAge-=1000*60*7;
+        if (Game.Has('Sugar aging process')) Game.lumpRipeAge-=6000*Math.min(600,Game.Objects['Grandma'].amount);//capped at 600 grandmas
+        if (Game.hasGod && Game.BuildingsOwned%10==0)
+        {
+            var godLvl=Game.hasGod('order');
+            if (godLvl==1) Game.lumpRipeAge-=hour;
+            else if (godLvl==2) Game.lumpRipeAge-=(hour/3)*2;
+            else if (godLvl==3) Game.lumpRipeAge-=(hour/3);
+        }
+        //if (Game.hasAura('Dragon\'s Curve')) {Game.lumpMatureAge/=1.05;Game.lumpRipeAge/=1.05;}
+        Game.lumpMatureAge/=1+Game.auraMult('Dragon\'s Curve')*0.05;Game.lumpRipeAge/=1+Game.auraMult('Dragon\'s Curve')*0.05;
+        Game.lumpOverripeAge=Game.lumpRipeAge+hour;
+        if (Game.Has('Glucose-charged air')) {Game.lumpMatureAge/=2000;Game.lumpRipeAge/=2000;Game.lumpOverripeAge/=2000;}
+    }
+
+
 }
