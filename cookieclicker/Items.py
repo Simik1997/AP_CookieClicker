@@ -487,7 +487,7 @@ cookie_multiplier = {
   "Random Cookie Multiplier 9999999x": 42069647,
   "Random Cookie Multiplier 0.5x": 42069648  
 }
-
+# Traps start ID 42069649
 traps = {
 
     "-1 Random Building": 42069649,
@@ -504,6 +504,7 @@ traps = {
     "-90% Cookies": 42069660,
     "-100% Cookies": 42069661
 }
+# Structures start ID 42069465
 
 structures = {
   "Unlock Cursor": 42069465,

@@ -36,22 +36,20 @@ class CookieClicker(World):
         self.multiworld.regions.append(achievment_region)
         for location in location_table:
             achievment_region.add_locations({ f"{location}":self.location_name_to_id[location]}, CKLocation)
-        
+        # just one region for now, but we should add more later for sanity checks
         region.connect(achievment_region, "Achievments")
+    
     def create_item(self, name: str) -> CKItem:
         if upgrades.get(name) is not None:
             return CKItem(name, ItemClassification.progression, self.item_name_to_id[name], self.player)
         if structures.get(name) is not None:
             return CKItem(name, ItemClassification.progression, self.item_name_to_id[name], self.player)
         if cookie_multiplier.get(name) is not None:
-            return CKItem(name, ItemClassification.useful, self.item_name_to_id[name], self.player)
+            return CKItem(name, ItemClassification.filler, self.item_name_to_id[name], self.player)
         
         return CKItem(name, ItemClassification.filler, self.item_name_to_id[name], self.player)
 
     def create_items(self):
-        
-        #for cm in cookie_multiplier:
-        #    self.multiworld.itempool.append(self.create_item(cm))
         
         for upgrade in upgrades:
             self.multiworld.itempool.append(self.create_item(upgrade))
@@ -61,6 +59,7 @@ class CookieClicker(World):
 
         total_location_count = len(self.multiworld.get_unfilled_locations(self.player)) - len(cookie_multiplier) - len(upgrades) - len(structures)
         
+        # static value maybe variable in future 
         total_multiplier_location_count = int(len(self.multiworld.get_unfilled_locations(self.player)) * 0.35)
 
         for i in range(total_multiplier_location_count):
@@ -71,11 +70,16 @@ class CookieClicker(World):
 
         for i in range(trap_location_count):
             self.multiworld.itempool.append(self.create_item(str(random.choice(list(traps.keys())))))
+        
+    # we got some games which leave some locations unfilled, so we need to fill them with some filler items
+    def pre_fill(self):
+        missing_locs = len(self.multiworld.get_unfilled_locations()) - len(self.multiworld.itempool)
+        if missing_locs > 0:
+            self.multiworld.itempool += [self.create_filler() for _ in range(missing_locs)]
+    
+    def create_filler(self) -> Item:
+        return self.create_item(str(random.choice(list(cookie_multiplier.keys()))))
 
-        for i in range(total_location_count - trap_location_count - total_multiplier_location_count):
-            self.multiworld.itempool.append(self.create_item("No Cookies for U"))
-
-       
     def fill_slot_data(self) -> dict:
         slot_data = self._get_ck_data()
         for option_name in ck_options:
