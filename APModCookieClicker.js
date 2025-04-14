@@ -10,12 +10,13 @@
 // @grant        none
 // ==/UserScript==
 
-//IF YOU DONT LIKE TO USE THE AUTO UPDATER, USE THIS VERSION > UNCOMMENT THE NEXT 2 LINES
-
-
 const { Client, ITEMS_HANDLING_FLAGS, SERVER_PACKET_TYPE, CREATE_AS_HINT_MODE, CLIENT_STATUS, CONNECTION_STATUS, CLIENT_PACKET_TYPE, SetOperationsBuilder } = await import("https://unpkg.com/archipelago.js@1.0.0/dist/archipelago.js");
 //'use strict';
 
+//#TODO
+//Error Handling on Connection
+//Logic for Achievements 
+//Configs for Shimmer and Sugar Lump Times
 
 console.log("AP CookieClicker loaded");
 
@@ -23,7 +24,8 @@ console.log("AP CookieClicker loaded");
 //therefore code is splitted into Archipelago stuff, and Game specific Stuff
 //so you just need to change Game Specific stuff 
 
-//ToastLibary, for Announcement on some Sites
+//ToastLibary, for Announcements
+
 const cssToast = document.createElement('link')
 cssToast.href = 'https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css';
 cssToast.type = 'text/css';
@@ -34,6 +36,7 @@ const scriptToast = document.createElement('script')
 scriptToast.src = 'https://cdn.jsdelivr.net/npm/toastify-js';
 scriptToast.type = 'text/javascript';
 document.head.append(scriptToast);
+
 
 /* Usage
     Toastify({
@@ -242,8 +245,14 @@ function connectAP() {
             console.log("Connected to the server");
         })
         .catch((error) => {
-            console.error("Failed to connect:", error);
-            toast(error);
+            console.error("Failed to connect:", error.toString());
+            toast(error.toString());
+            connect.disabled = true;
+            hostname.disabled = true;
+            port.disabled = true;
+            name.disabled = true;
+            password.disabled = true;
+            consoleInput.disabled = false;
         });
 
     // Disconnect from the server when unloading window.
@@ -579,13 +588,13 @@ function appendFunctions() {
             Game.runModHook('reincarnate');
             
             //reApply all items
-            //TODO
             recievedItems.forEach(id => {
                 recieveItem(id, false);
             });
         }
     }
 
+    //TODO Use Config?
     Game.computeLumpTimes=function()
     {
         var hour=1000*6; //0*60;

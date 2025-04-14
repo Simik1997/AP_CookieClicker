@@ -18,5 +18,5 @@
 await import('https://cdn.jsdelivr.net/gh/Simik1997/AP_CookieClicker@latest/APModCookieClicker.js'); //jsdelivr is a cdn for github
 
 //if it doesnt Update, purge the cdn cache
-//https://www.jsdelivr.com/tools/purge
+//  
 //Purge > https://cdn.jsdelivr.net/gh/Simik1997/AP_CookieClicker@latest/APModCookieClicker.js
