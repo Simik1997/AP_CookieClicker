@@ -4,7 +4,7 @@ from BaseClasses import Tutorial, Region, MultiWorld, Item, CollectionState, Ite
 from Utils import visualize_regions
 from worlds.AutoWorld import World
 from Options import PerGameCommonOptions
-from .Items import CCItem, traps, item_table, upgrades, structures, cookie_multiplier
+from .Items import CCItem, traps, item_table, upgrades, structures, cookie_multiplier, cookie_multiplier_weights
 from typing import Dict, Any
 from .Locations import CCLocation, location_table
 from .Options import CCOptions
@@ -16,6 +16,8 @@ class CookieClicker(World):
     options_dataclass = CCOptions
     options: CCOptions
     item_name_to_id = { name: data.code for name, data in item_table.items() }
+    cookie_names = [ item.item_name for item in cookie_multiplier ]
+    cookie_weights = [ cookie_multiplier_weights.get(item.item_name, 1) for item in cookie_multiplier ]
     start_inventory = {}
     trashitems = 0
 
