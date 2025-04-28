@@ -13,14 +13,14 @@
 const { Client, ITEMS_HANDLING_FLAGS, SERVER_PACKET_TYPE, CREATE_AS_HINT_MODE, CLIENT_STATUS, CONNECTION_STATUS, CLIENT_PACKET_TYPE, SetOperationsBuilder } = await import("https://unpkg.com/archipelago.js@1.0.0/dist/archipelago.js");
 //'use strict';
 
-//#TODO
-//Error Handling on Connection
-//Logic for Achievements 
-//Configs for Shimmer and Sugar Lump Times
+// TODO
+// Error Handling on Connection
+// Logic for Achievements 
+// Configs for Shimmer and Sugar Lump Times
 
 console.log("AP CookieClicker loaded");
 
-//this startet as cookieclicker, but should work as a template for all browsergames
+//this started as Cookieclicker, but should work as a template for all browser games
 //therefore code is splitted into Archipelago stuff, and Game specific Stuff
 //so you just need to change Game Specific stuff 
 
@@ -45,7 +45,7 @@ document.head.append(scriptToast);
     }).showToast();
 */
 
-// input fields
+// Input fields
 const connectionContainer = document.createElement("div");
 const hostname = document.createElement("input");   
 const port = document.createElement("input");
@@ -58,7 +58,7 @@ connect.onclick = function () {
     connectAP();
 };
 const text = document.createElement("span");
-var client = null; //after connection there will be a client
+var client = null; // After connection there will be a client
 
 connectionContainer.style.display = "flex";
 connectionContainer.style.margin = "0";
@@ -87,7 +87,7 @@ password.style.width = "100px";
 connect.innerText = "Connect";
 consoleInput.placeholder = "!hint"
 
-//console
+// Console
 consoleInput.addEventListener("keypress", function (event) {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -105,22 +105,22 @@ function typeToText(element) {
     id = Number(element.text);
     var playerId = window.client.data.slotData.player_id;
     
-    if(element.player !== undefined){
-      playerId = Number(element.player);
+    if(element.player !== undefined) {
+        playerId = Number(element.player);
     }
     if (element.type === "player_id" && !isNaN(id)) {
-      return window.client.players.name(Number(id));
+        return window.client.players.name(Number(id));
     } else if (element.type === "item_id" && !isNaN(id)) {
-      return window.client.items.name(window.client.players.game(Number(playerId)), Number(id))
+        return window.client.items.name(window.client.players.game(Number(playerId)), Number(id))
     } else if (element.type === "location_id" && !isNaN(id)) {
-      return window.client.locations.name(window.client.players.game(Number(playerId)), Number(id))
+        return window.client.locations.name(window.client.players.game(Number(playerId)), Number(id))
     }
-    else if (element.text !== undefined){
-      return element.text;
+    else if (element.text !== undefined) {
+        return element.text;
     } else {
-      return element;
+        return element;
     }
-  }
+}
 
 function packetToText(packet) {
     if (packet === undefined) {
@@ -148,7 +148,6 @@ function releaseAll() {
     window.client.locations.autoRelease()
 }
 
-
 function connectAP() {
     window.client = new Client();
     connect.disabled = true;
@@ -158,10 +157,10 @@ function connectAP() {
     password.disabled = true;
     consoleInput.disabled = false;
 
-    if(parseInt(port.value) !== parseInt(localStorage.getItem('port'))){
+    if(parseInt(port.value) !== parseInt(localStorage.getItem('port'))) {
         if (confirm("Your Port changed, so this might be a new Game. DELETE LOCAL SAVE GAME?") == true) {
             Game.HardReset(2);
-            recievedItems = [];
+            receivedItems = [];
         }
     }
 
@@ -169,13 +168,13 @@ function connectAP() {
     const connectionInfo = {
         hostname: hostname.value,
         port: parseInt(port.value),
-        game: gamename,
+        game: gameName,
         name: name.value,
         password: password.value,
         items_handling: ITEMS_HANDLING_FLAGS.REMOTE_ALL,
     };
 
-    //if connected
+    // If connected
     window.client.disconnect();
 
     // Set up event listeners
@@ -190,35 +189,35 @@ function connectAP() {
     });
 
     window.client.addListener(SERVER_PACKET_TYPE.RECEIVED_ITEMS, (packet) => {
-        console.log("Recieved Items: ", packet);
+        console.log("Received Items: ", packet);
 
-        //when items.length > 1 its an reconnect
-        if(packet.items.length>1){
+        // When items.length > 1 its an reconnect
+        if(packet.items.length>1) {
             var serverItems = [];
 
-            //execute Items with firstTime = false > only Unlocks, no Traps or Items
+            // Execute Items with firstTime = false > only Unlocks, no Traps or Items
             packet.items.forEach(item => {
-                recieveItem(item.item, false);
+                receiveItem(item.item, false);
                 serverItems.push(item.item);
             });
             
-            //compare serverItems with local saved(and executed Items)
-            let difference = serverItems.filter(x => !recievedItems.includes(x));
+            // Compare serverItems with local saved (and executed Items)
+            let difference = serverItems.filter(x => !receivedItems.includes(x));
             console.log("serverItems")
             console.log(serverItems)
 
-            console.log("recievedItems")
-            console.log(recievedItems)
+            console.log("receivedItems")
+            console.log(receivedItems)
 
             console.log("difference")
             console.log(difference)
 
             difference.forEach(id => {
-                recieveItem(id, true);
+                receiveItem(id, true);
             });
 
-        } else { //Just one Item means its new > alwaye use
-            recieveItem(packet.items[0].item, true);
+        } else { // Just one Item means its new > always use
+            receiveItem(packet.items[0].item, true);
         }
     });
 
@@ -229,7 +228,6 @@ function connectAP() {
 
     window.client.addListener(SERVER_PACKET_TYPE.PRINT_JSON, (packet) => {
         console.log("Print JSON: ", packet);
-
         var msg = packetToText(packet.data);
         if (msg === "") {
             return;
@@ -255,7 +253,7 @@ function connectAP() {
             consoleInput.disabled = false;
         });
 
-    // Disconnect from the server when unloading window.
+    // Disconnect from the server when unloading window
     window.addEventListener("beforeunload", () => {
         window.client.disconnect();
     });
@@ -273,18 +271,18 @@ hostname.value = "archipelago.gg";
 /*                                   */
 /*                                   */
 
-var gamename = "Cookie Clicker"
+var gameName = "Cookie Clicker"
 var checkIdOffset = 42069001;
-var goalAchievmentCount = 99;
-var recievedItems = []
+var goalAchievementCount = 99;
+var receivedItems = []
 
 
 /* On Site Loaded */
-//disable CookieClicker
+// Disable CookieClicker
 document.getElementById("wrapper").style.visibility = "hidden";
 
 function save() {
-    localStorage.setItem('recievedItems', JSON.stringify(recievedItems))
+    localStorage.setItem('receivedItems', JSON.stringify(receivedItems))
     localStorage.setItem('host', hostname.value);
     localStorage.setItem('port', port.value);
     localStorage.setItem('name', name.value);
@@ -292,7 +290,7 @@ function save() {
 }
 
 function load() {
-    recievedItems = JSON.parse(localStorage.getItem('recievedItems')) || [];
+    receivedItems = JSON.parse(localStorage.getItem('receivedItems')) || [];
 
     let urlParams = new URLSearchParams(window.location.search);
     hostname.value = urlParams.get('host') || urlParams.get('Host') || localStorage.getItem('host') || hostname.value || 'archipelago.gg';
@@ -307,7 +305,7 @@ function randomProperty(obj) {
     return obj[keys[keys.length * Math.random() << 0]];
 };
 
-//for This game we Use the Games Chat, not the default Toast
+// For this game we use the Games Chat, not the default Toast
 function toast(message) {
     Game.Notify("Archipelago", message);
     /* 
@@ -318,18 +316,17 @@ function toast(message) {
     */
 }
 
-function recieveItem(id, firstTime) {
+function receiveItem(id, firstTime) {
     var building = randomProperty(Game.Objects);
 
-    
     if(firstTime){
-        recievedItems.push(id);
+        receivedItems.push(id);
         console.log("I apply a new item!" + id);
     }
 
     save();
 
-    //cookie Multiplyer
+    // Cookie Multiplier
     if (id === 42069644 && firstTime) {
         Game.cookies = Game.cookies * 2;
         console.log("*2 Cookies");
@@ -345,111 +342,111 @@ function recieveItem(id, firstTime) {
     } else if (id === 42069648 && firstTime) {
         Game.cookies = Game.cookies * 0.5;
         console.log("*0.5 Cookies");
-    } else if (id === 42069465) { //Unlock Cursor
+    } else if (id === 42069465) { // Unlock Cursor
         document.getElementById("product0").style.display = "";
-    } else if (id === 42069466) { //Unlock Farm
+    } else if (id === 42069466) { // Unlock Farm
         document.getElementById("product2").style.display = "";
-    } else if (id === 42069467) { //Unlock Mine
+    } else if (id === 42069467) { // Unlock Mine
         document.getElementById("product3").style.display = "";
-    } else if (id === 42069468) { //Unlock Factory
+    } else if (id === 42069468) { // Unlock Factory
         document.getElementById("product4").style.display = "";
-    } else if (id === 42069469) { //Unlock Bank
+    } else if (id === 42069469) { // Unlock Bank
         document.getElementById("product5").style.display = "";
-    } else if (id === 42069470) { //Unlock Temple
+    } else if (id === 42069470) { // Unlock Temple
         document.getElementById("product6").style.display = "";
-    } else if (id === 42069471) { //Unlock Wizard Tower
+    } else if (id === 42069471) { // Unlock Wizard Tower
         document.getElementById("product7").style.display = "";
-    } else if (id === 42069472) { //Unlock Shipment
+    } else if (id === 42069472) { // Unlock Shipment
         document.getElementById("product8").style.display = "";
-    } else if (id === 42069473) { //Unlock Alchemy Lab
+    } else if (id === 42069473) { // Unlock Alchemy Lab
         document.getElementById("product9").style.display = "";
-    } else if (id === 42069474) { //Unlock Portal
+    } else if (id === 42069474) { // Unlock Portal
         document.getElementById("product10").style.display = "";
-    } else if (id === 42069475) { //Unlock Time Machine
+    } else if (id === 42069475) { // Unlock Time Machine
         document.getElementById("product11").style.display = "";
-    } else if (id === 42069476) { //Unlock Antimatter Condenser
+    } else if (id === 42069476) { // Unlock Antimatter Condenser
         document.getElementById("product12").style.display = "";
-    } else if (id === 42069477) { //Unlock Prism
+    } else if (id === 42069477) { // Unlock Prism
         document.getElementById("product13").style.display = "";
-    } else if (id === 42069478) { //Unlock Chancemaker
+    } else if (id === 42069478) { // Unlock Chancemaker
         document.getElementById("product14").style.display = "";
-    } else if (id === 42069479) { //Unlock Fractal Engine
+    } else if (id === 42069479) { // Unlock Fractal Engine
         document.getElementById("product15").style.display = "";
-    } else if (id === 42069480) { //Unlock Javascript Console
+    } else if (id === 42069480) { // Unlock Javascript Console
         document.getElementById("product16").style.display = "";
-    } else if (id === 42069481) { //Unlock Idleverse
+    } else if (id === 42069481) { // Unlock Idleverse
         document.getElementById("product17").style.display = "";
-    } else if (id === 42069482) { //Unlock Cortex Baker
+    } else if (id === 42069482) { // Unlock Cortex Baker
         document.getElementById("product18").style.display = "";
-    } else if (id === 42069483) { //Unlock You
+    } else if (id === 42069483) { // Unlock You
         document.getElementById("product19").style.display = "";
     } else if (id < 42069649) { // UPGRADES
         Game.UpgradesById[id - checkIdOffset].basePrice = -1;
-        var sucess = Game.UpgradesById[id - checkIdOffset].buy();
-        if(sucess !== 1){
-            //if there is no buy function, set it to bought manual.
+        var success = Game.UpgradesById[id - checkIdOffset].buy();
+        if(success !== 1){
+            // If there is no buy function, set it to bought manually
             Game.UpgradesById[id - checkIdOffset].bought=1;
         }
-    } else if (id === 42069649 && firstTime) { // TRAPS  -1 Gebäude
+    // TRAPS
+    } else if (id === 42069649 && firstTime) {
         if (building.amount >= 1) {
             building.amount -= 1;
         } else {
             building.amount = 0;
         }
         Game.Notify("Archipelago", '-1 ' + building.name);
-        console.log("-1 Gebäude");
-    } else if (id === 42069650 && firstTime) { // -10 Gebäude
+        console.log("-1 Building");
+    } else if (id === 42069650 && firstTime) {
         if (building.amount >= 10) {
             building.amount -= 10;
         } else {
             building.amount = 0;
         }
         Game.Notify("Archipelago", '-10 ' + building.name);
-        console.log("-10 Gebäude");
-    } else if (id === 42069651 && firstTime) { // -100 Gebäude
+        console.log("-10 Building");
+    } else if (id === 42069651 && firstTime) {
         if (building.amount >= 100) {
             building.amount -= 100;
         } else {
             building.amount = 0;
         }
         Game.Notify("Archipelago", '-100 ' + building.name);
-        console.log("-100 Gebäude");
-    } else if (id === 42069652 && firstTime) { // -10% Cookies
+        console.log("-100 Building");
+    } else if (id === 42069652 && firstTime) {
         Game.cookies = Game.cookies * 0.9;
         console.log("-10% Cookies");
-    } else if (id === 42069653 && firstTime) { // -20% Cookies
+    } else if (id === 42069653 && firstTime) {
         Game.cookies = Game.cookies * 0.8;
         console.log("-20% Cookies");
-    } else if (id === 42069654 && firstTime) { // -30% Cookies
+    } else if (id === 42069654 && firstTime) {
         Game.cookies = Game.cookies * 0.7;
         console.log("-30% Cookies");
-    } else if (id === 42069655 && firstTime) { // -40% Cookies
+    } else if (id === 42069655 && firstTime) {
         Game.cookies = Game.cookies * 0.6;
         console.log("-40% Cookies");
-    } else if (id === 42069656 && firstTime) { // -50% Cookies
+    } else if (id === 42069656 && firstTime) {
         Game.cookies = Game.cookies * 0.5;
         console.log("-50% Cookies");
-    } else if (id === 42069657 && firstTime) { // -60% Cookies
+    } else if (id === 42069657 && firstTime) {
         Game.cookies = Game.cookies * 0.4;
         console.log("-60% Cookies");
-    } else if (id === 42069658 && firstTime) { // -70% Cookies
+    } else if (id === 42069658 && firstTime) {
         Game.cookies = Game.cookies * 0.3;
         console.log("-70% Cookies");
-    } else if (id === 42069659 && firstTime) { // -80% Cookies
+    } else if (id === 42069659 && firstTime) {
         Game.cookies = Game.cookies * 0.2;
         console.log("-80% Cookies");
-    } else if (id === 42069660 && firstTime) { // -90% Cookies
+    } else if (id === 42069660 && firstTime) {
         Game.cookies = Game.cookies * 0.1;
         console.log("-90% Cookies");
-    } else if (id === 42069661 && firstTime) { // -100% Cookies
+    } else if (id === 42069661 && firstTime) {
         Game.cookies = 0;
         console.log("-100% Cookies");
     }
 }
 
-//append Functions which need to be set or overwritten after Connection during Runtime
+// Append functions which need to be set or overwritten after Connection during Runtime
 function appendFunctions() {
-
     //enable CookieClicker
     document.getElementById("wrapper").style.visibility = "visible";
 
@@ -478,12 +475,12 @@ function appendFunctions() {
     document.getElementById("product18").style.display = "none";
     document.getElementById("product19").style.display = "none";
 
-    //set AchievementCount as Goal
+    // Set advancement_goal as goalAchievementCount
     if (window.client.data.slotData.advancement_goal !== null) {
-        goalAchievmentCount = window.client.data.slotData.advancement_goal;
+        goalAchievementCount = window.client.data.slotData.advancement_goal;
     }
 
-    //overwrite for Win Function CookieClicker
+    // Overwrite for win function CookieClicker
     Game.Win = function (what) {
         if (typeof what === 'string') {
             if (Game.Achievements[what]) {
@@ -497,10 +494,10 @@ function appendFunctions() {
                     Game.recalculateGains = 1;
                     if (App && it.vanilla) App.gotAchiev(it.id);
 
-                    //send AchievementID to AP
+                    // Send AchievementID to AP
                     sendCheckIdToAp(it.id + checkIdOffset)
 
-                    if (Game.AchievementsOwned >= goalAchievmentCount) {//TODO WIN COUNT?
+                    if (Game.AchievementsOwned >= goalAchievementCount) {// TODO WIN COUNT?
                         releaseAll();
                     }
                 }
@@ -509,20 +506,17 @@ function appendFunctions() {
         else { for (var i in what) { Game.Win(what[i]); } }
     }
 
-    //overwrite Cookies
+    // Overwrite Cookies
     //10x Shimmers
     var shimmersFactor = 10;
 
-    Game.updateShimmers=function()//run shimmer functions, kill overtimed shimmers and spawn new ones
-    {
-        for (var i in Game.shimmers)
-        {
+    Game.updateShimmers = function() {// Run shimmer functions, kill overtimed shimmers and spawn new ones
+        for (var i in Game.shimmers) {
             Game.shimmers[i].update();
         }
         
-        //cookie storm!
-        if (Game.hasBuff('Cookie storm') && Math.random()<0.5)
-        {
+        // Cookie storm!
+        if (Game.hasBuff('Cookie storm') && Math.random()<0.5) {
             var newShimmer=new Game.shimmer('golden',{type:'cookie storm drop'},1);
             newShimmer.dur=Math.ceil(Math.random()*4+1);
             newShimmer.life=Math.ceil(Game.fps*newShimmer.dur);
@@ -530,22 +524,17 @@ function appendFunctions() {
             newShimmer.sizeMult=Math.random()*0.75+0.25;
         }
         
-        //spawn shimmers
-        for (var i in Game.shimmerTypes)
-        {
-            var me=Game.shimmerTypes[i];
-            if (me.spawnsOnTimer && me.spawnConditions())//only run on shimmer types that work on a timer
-            {
-                if (!me.spawned)//no shimmer spawned for this type? check the timer and try to spawn one
-                {
+        // Spawn shimmers
+        for (var i in Game.shimmerTypes) {
+            var me = Game.shimmerTypes[i];
+            if (me.spawnsOnTimer && me.spawnConditions()) { // Only run on shimmer types that work on a timer
+                if (!me.spawned) { // No shimmer spawned for this type? Check the timer and try to spawn one
                     //me.time++;
                     me.time = me.time + shimmersFactor;
-
-                    if (Math.random()<Math.pow(Math.max(0,(me.time-me.minTime)/(me.maxTime-me.minTime)),5))
-                    {
-                        var newShimmer=new Game.shimmer(i);
+                    if (Math.random() < Math.pow(Math.max(0, (me.time-me.minTime) / (me.maxTime-me.minTime)), 5)) {
+                        var newShimmer = new Game.shimmer(i);
                         newShimmer.spawnLead=1;
-                        if (Game.Has('Distilled essence of redoubled luck') && Math.random()<0.01) var newShimmer=new Game.shimmer(i);
+                        if (Game.Has('Distilled essence of redoubled luck') && Math.random()<0.01) var newShimmer = new Game.shimmer(i);
                         me.spawned=1;
                     }
                 }
@@ -553,69 +542,67 @@ function appendFunctions() {
         }
     }
 
-    Game.Reincarnate=function(bypass)
-    {
-        if (!bypass) Game.Prompt('<id Reincarnate><h3>'+loc("Reincarnate")+'</h3><div class="block">'+loc("Are you ready to return to the mortal world?")+'</div>',[[loc("Yes"),'Game.ClosePrompt();Game.Reincarnate(1);'],loc("No")]);
-        else
-        {
-            Game.ascendUpgradesl.innerHTML='';
-            Game.ascensionMode=Game.nextAscensionMode;
-            Game.nextAscensionMode=0;
+    Game.Reincarnate=function(bypass) {
+        if (!bypass) Game.Prompt('<id Reincarnate><h3>' + loc("Reincarnate") + '</h3><div class="block">' + loc("Are you ready to return to the mortal world?") + '</div>', [[loc("Yes"), 'Game.ClosePrompt();Game.Reincarnate(1);'], loc("No")]);
+        else {
+            Game.ascendUpgradesl.innerHTML = '';
+            Game.ascensionMode = Game.nextAscensionMode;
+            Game.nextAscensionMode = 0;
             Game.Reset();
-            if (Game.HasAchiev('Rebirth'))
-            {
-                Game.Notify('Reincarnated',loc("Hello, cookies!"),[10,0],4);
+            if (Game.HasAchiev('Rebirth')) {
+                Game.Notify('Reincarnated', loc("Hello, cookies!"), [10, 0], 4);
             }
-            if (Game.resets>=1000) Game.Win('Endless cycle');
-            if (Game.resets>=100) Game.Win('Reincarnation');
-            if (Game.resets>=10) Game.Win('Resurrection');
-            if (Game.resets>=1) Game.Win('Rebirth');
-            
-            var prestigeUpgradesOwned=0;
-            for (var i in Game.Upgrades)
-            {
-                if (Game.Upgrades[i].bought && Game.Upgrades[i].pool=='prestige') prestigeUpgradesOwned++;
+            if (Game.resets >= 1000) Game.Win('Endless cycle');
+            if (Game.resets >= 100) Game.Win('Reincarnation');
+            if (Game.resets >= 10) Game.Win('Resurrection');
+            if (Game.resets >= 1) Game.Win('Rebirth');
+
+            var prestigeUpgradesOwned = 0;
+            for (var i in Game.Upgrades) {
+                if (Game.Upgrades[i].bought && Game.Upgrades[i].pool == 'prestige') prestigeUpgradesOwned++;
             }
-            if (prestigeUpgradesOwned>=100) Game.Win('All the stars in heaven');
-            
+            if (prestigeUpgradesOwned >= 100) Game.Win('All the stars in heaven');
+
             Game.removeClass('ascending');
             Game.OnAscend=0;
-            //trigger the reincarnate animation
+
+            // Trigger the reincarnate animation
             Game.ReincarnateTimer=1;
             Game.addClass('reincarnating');
             Game.BigCookieSize=0;
-            
+
             Game.runModHook('reincarnate');
-            
-            //reApply all items
-            recievedItems.forEach(id => {
-                recieveItem(id, false);
+
+            // Reapply all items
+            receivedItems.forEach(id => {
+                receiveItem(id, false);
             });
         }
     }
 
-    //TODO Use Config?
-    Game.computeLumpTimes=function()
-    {
-        var hour=1000*6; //0*60;
-        Game.lumpMatureAge=hour*20;
-        Game.lumpRipeAge=hour*23;
-        if (Game.Has('Stevia Caelestis')) Game.lumpRipeAge-=hour;
-        if (Game.Has('Diabetica Daemonicus')) Game.lumpMatureAge-=hour;
-        if (Game.Has('Ichor syrup')) Game.lumpMatureAge-=1000*60*7;
-        if (Game.Has('Sugar aging process')) Game.lumpRipeAge-=6000*Math.min(600,Game.Objects['Grandma'].amount);//capped at 600 grandmas
-        if (Game.hasGod && Game.BuildingsOwned%10==0)
-        {
-            var godLvl=Game.hasGod('order');
-            if (godLvl==1) Game.lumpRipeAge-=hour;
-            else if (godLvl==2) Game.lumpRipeAge-=(hour/3)*2;
-            else if (godLvl==3) Game.lumpRipeAge-=(hour/3);
+    // TODO Use Config?
+    Game.computeLumpTimes = function() {
+        var hour = 1000 * 6;
+        Game.lumpMatureAge = hour * 20;
+        Game.lumpRipeAge = hour * 23;
+        if (Game.Has('Stevia Caelestis')) Game.lumpRipeAge -= hour;
+        if (Game.Has('Diabetica Daemonicus')) Game.lumpMatureAge -= hour;
+        if (Game.Has('Ichor syrup')) Game.lumpMatureAge -= 1000 * 60 * 7;
+        if (Game.Has('Sugar aging process')) Game.lumpRipeAge -= 6000 * Math.min(600, Game.Objects['Grandma'].amount); // Capped at 600 grandmas
+        if (Game.hasGod && Game.BuildingsOwned % 10 == 0) {
+            var godLvl = Game.hasGod('order');
+            if (godLvl == 1) Game.lumpRipeAge -= hour;
+            else if (godLvl == 2) Game.lumpRipeAge -= (hour/3) * 2;
+            else if (godLvl == 3) Game.lumpRipeAge -= (hour/3);
         }
         //if (Game.hasAura('Dragon\'s Curve')) {Game.lumpMatureAge/=1.05;Game.lumpRipeAge/=1.05;}
-        Game.lumpMatureAge/=1+Game.auraMult('Dragon\'s Curve')*0.05;Game.lumpRipeAge/=1+Game.auraMult('Dragon\'s Curve')*0.05;
-        Game.lumpOverripeAge=Game.lumpRipeAge+hour;
-        if (Game.Has('Glucose-charged air')) {Game.lumpMatureAge/=2000;Game.lumpRipeAge/=2000;Game.lumpOverripeAge/=2000;}
+        Game.lumpMatureAge /= 1 + Game.auraMult('Dragon\'s Curve') * 0.05; 
+        Game.lumpRipeAge /= 1 + Game.auraMult('Dragon\'s Curve') * 0.05;
+        Game.lumpOverripeAge = Game.lumpRipeAge+hour;
+        if (Game.Has('Glucose-charged air')) { 
+            Game.lumpMatureAge /= 2000;
+            Game.lumpRipeAge /= 2000;
+            Game.lumpOverripeAge /= 2000;
+        }
     }
-
-
 }

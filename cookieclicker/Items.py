@@ -1,7 +1,6 @@
 from BaseClasses import Item
 
-
-class CKItem(Item):
+class CCItem(Item):
     game = "Cookie Clicker"
 
 # upgrades START ID 42069001
@@ -380,7 +379,7 @@ upgrades = {
     "Designer cocoa beans": 42069067,
     "Ritual rolling pins": 42069068,
     "Underworld ovens": 42069069,
-    "One mind [note 3]": 42069070,
+    "One mind": 42069070,
     "Exotic nuts": 42069071,
     "Communal brainsweep": 42069072,
     "Arcane sugar": 42069073,
@@ -451,7 +450,7 @@ upgrades = {
     "Omelette": 42069227,
     "Chocolate egg": 42069228,
     "Century egg": 42069229,
-    "egg[note 7]": 42069230,
+    "\"egg\"": 42069230,
     "Fortune #001": 42069622,
     "Fortune #002": 42069623,
     "Fortune #003": 42069624,
@@ -487,9 +486,9 @@ cookie_multiplier = {
   "Random Cookie Multiplier 9999999x": 42069647,
   "Random Cookie Multiplier 0.5x": 42069648  
 }
+
 # Traps start ID 42069649
 traps = {
-
     "-1 Random Building": 42069649,
     "-10 Random Building": 42069650,
     "-100 Random Building": 42069651,
@@ -504,8 +503,8 @@ traps = {
     "-90% Cookies": 42069660,
     "-100% Cookies": 42069661
 }
-# Structures start ID 42069465
 
+# Structures start ID 42069465
 structures = {
   "Unlock Cursor": 42069465,
   "Unlock Farm": 42069466,
