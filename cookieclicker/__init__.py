@@ -3,11 +3,13 @@ import json
 from BaseClasses import Tutorial, Region, MultiWorld, Item, CollectionState, ItemClassification
 from Utils import visualize_regions
 from worlds.AutoWorld import World
+from worlds.generic.Rules import add_rule
 from Options import PerGameCommonOptions
 from .Items import CCItem, traps, item_table, upgrades, structures, cookie_multiplier, cookie_multiplier_weights
 from typing import Dict, Any
 from .Locations import CCLocation, location_table
 from .Options import CCOptions
+from .Rules import set_rules
 
 class CookieClicker(World):
     game = "Cookie Clicker"
@@ -82,3 +84,5 @@ class CookieClicker(World):
             "traps_percentage": self.options.traps_percentage.value,
             "race": self.multiworld.is_race
         }
+
+    set_rules = set_rules
