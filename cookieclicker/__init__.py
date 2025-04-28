@@ -15,7 +15,7 @@ class CookieClicker(World):
     location_name_to_id = location_table
     options_dataclass = CCOptions
     options: CCOptions
-    item_name_to_id = item_table
+    item_name_to_id = { name: data.code for name, data in item_table.items() }
     start_inventory = {}
     trashitems = 0
 
