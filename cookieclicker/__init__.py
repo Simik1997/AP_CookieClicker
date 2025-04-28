@@ -7,27 +7,17 @@ from Options import PerGameCommonOptions
 from .Items import CCItem, traps, item_table, upgrades, structures, cookie_multiplier
 from typing import Dict, Any
 from .Locations import CCLocation, location_table
-from .Options import CCOptions, cc_options
+from .Options import CCOptions
 
 class CookieClicker(World):
     game = "Cookie Clicker"
     worldversion = "0.5.0"
     location_name_to_id = location_table
-    option_definitions = cc_options
+    options_dataclass = CCOptions
+    options: CCOptions
     item_name_to_id = item_table
     start_inventory = {}
     trashitems = 0
-    options: CCOptions
-    options_dataclass: CCOptions
-    
-    def _get_cc_data(self) -> Dict[str, Any]:
-        return {
-            'player_name': self.multiworld.get_player_name(self.player),
-            'player_id': self.player,
-            'advancement_goal': self.multiworld.advancement_goal[self.player].value,
-            'traps_percentage': self.multiworld.traps_percentage[self.player].value,
-            'race': self.multiworld.is_race
-        }
 
     def create_regions(self):
         region = Region("Menu", self.player, self.multiworld)
@@ -40,31 +30,37 @@ class CookieClicker(World):
         region.connect(achievement_region, "Achievements")
 
     def create_item(self, name: str) -> CCItem:
-        if upgrades.get(name) is not None:
-            return CCItem(name, ItemClassification.progression, self.item_name_to_id[name], self.player)
-        if structures.get(name) is not None:
-            return CCItem(name, ItemClassification.progression, self.item_name_to_id[name], self.player)
-        if cookie_multiplier.get(name) is not None:
-            return CCItem(name, ItemClassification.filler, self.item_name_to_id[name], self.player)
-        return CCItem(name, ItemClassification.filler, self.item_name_to_id[name], self.player)
+        item_data = item_table.get(name)
+        if item_data is None:
+            raise Exception(f"Tried to create unknown item: {name}")
+        return CCItem(name, item_data.classification, item_data.code, self.player)
 
     def create_items(self):
         for upgrade in upgrades:
-            self.multiworld.itempool.append(self.create_item(upgrade))
+            self.multiworld.itempool.append(self.create_item(upgrade.item_name))
+
         for structure_unlock in structures:
-            self.multiworld.itempool.append(self.create_item(structure_unlock))
+            self.multiworld.itempool.append(self.create_item(structure_unlock.item_name))
 
-        total_location_count = len(self.multiworld.get_unfilled_locations(self.player)) - len(cookie_multiplier) - len(upgrades) - len(structures)
-        # Static value maybe variable in future 
-        total_multiplier_location_count = int(len(self.multiworld.get_unfilled_locations(self.player)) * 0.35)
+        total_locations = len(self.multiworld.get_unfilled_locations(self.player))
+        placed_items_count = len(upgrades) + len(structures)
+        remaining_locations = total_locations - placed_items_count
 
-        for i in range(total_multiplier_location_count):
-            self.multiworld.itempool.append(self.create_item(str(random.choice(list(cookie_multiplier.keys())))))
+        if remaining_locations < 0:
+            raise Exception("More upgrades and structures than locations!")
 
-        trap_location_count = int((total_location_count - total_multiplier_location_count) * (self.multiworld.traps_percentage[self.player].value / 100))
+        trap_percent = self.options.traps_percentage.value / 100.0
+        trap_count = int(remaining_locations * trap_percent)
+        filler_count = remaining_locations - trap_count
 
-        for i in range(trap_location_count):
-            self.multiworld.itempool.append(self.create_item(str(random.choice(list(traps.keys())))))
+        trap_names = [item.item_name for item in traps]
+        for _ in range(trap_count):
+            trap_name = random.choice(trap_names)
+            self.multiworld.itempool.append(self.create_item(trap_name))
+
+        for _ in range(filler_count):
+            name = random.choices(self.cookie_names, weights = self.cookie_weights, k = 1)[0]
+            self.multiworld.itempool.append(self.create_item(name))
 
     # We got some games which leave some locations unfilled, so we need to fill them with some filler items
     def pre_fill(self):
@@ -73,12 +69,14 @@ class CookieClicker(World):
             self.multiworld.itempool += [self.create_filler() for _ in range(missing_locs)]
 
     def create_filler(self) -> Item:
-        return self.create_item(str(random.choice(list(cookie_multiplier.keys()))))
+        name = random.choices(self.cookie_names, weights = self.cookie_weights, k = 1)[0]
+        return self.create_item(name)
 
     def fill_slot_data(self) -> dict:
-        slot_data = self._get_cc_data()
-        for option_name in cc_options:
-            option = getattr(self.multiworld, option_name)[self.player]
-            if slot_data.get(option_name, None) is None and type(option.value) in {str, int}:
-                slot_data[option_name] = int(option.value)
-        return slot_data
+        return {
+            "player_name": self.multiworld.get_player_name(self.player),
+            "player_id": self.player,
+            "advancement_goal": self.options.advancement_goal.value,
+            "traps_percentage": self.options.traps_percentage.value,
+            "race": self.multiworld.is_race
+        }

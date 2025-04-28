@@ -4,7 +4,7 @@ from typing import Dict, NamedTuple, Optional
 class CCLocation(Location):
     game = "Cookie Clicker"
 
-#Achievements START ID 42069001
+# Achievements START ID 42069001
 achievements = {
     "Wake and bake": 42069001,
     "Making some dough": 42069002,
@@ -651,4 +651,6 @@ location_table = {
     **achievements
 }
 
-lookup_id_to_name: Dict[int, str] = {data: item_name for item_name, data in location_table.items() if data}
+lookup_id_to_name: Dict[int, str] = {
+    data: item_name for item_name, data in location_table.items() if data
+}

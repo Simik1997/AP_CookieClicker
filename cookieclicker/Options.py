@@ -19,8 +19,4 @@ class Traps(Range):
 @dataclass
 class CCOptions(PerGameCommonOptions):
     advancement_goal: Goal
-
-cc_options: typing.Dict[str, type(Option)] = {
-    "advancement_goal":                     Goal,
-    "traps_percentage":                     Traps
-}
+    traps_percentage: Traps
