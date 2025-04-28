@@ -497,13 +497,24 @@ function appendFunctions() {
                     // Send AchievementID to AP
                     sendCheckIdToAp(it.id + checkIdOffset)
 
-                    if (Game.AchievementsOwned >= goalAchievementCount) {// TODO WIN COUNT?
-                        releaseAll();
+                    if (Game.AchievementsOwned >= goalAchievementCount) { // TODO WIN COUNT?
+                        console.log("Win-condition met!")
+                        if (!window.client.finished_game) {
+                            window.client.send({
+                                cmd: "StatusUpdate",
+                                status: 30
+                            });
+                            window.client.finished_game = true;
+                        }
                     }
                 }
             }
         }
-        else { for (var i in what) { Game.Win(what[i]); } }
+        else {
+            for (var i in what) { 
+                Game.Win(what[i]);
+            }
+        }
     }
 
     // Overwrite Cookies
