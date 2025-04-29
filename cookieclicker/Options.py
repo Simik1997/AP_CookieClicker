@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from Options import Choice, Option, Toggle, DefaultOnToggle, Range, OptionList, DeathLink, PerGameCommonOptions
 
 class Goal(Range):
-    """Achievment Goal"""
-    display_name = "Achievment Goal"
+    """Achievement Goal"""
+    display_name = "Achievement Goal"
     range_start = 1
     range_end = 639
     default = 100
@@ -16,13 +16,7 @@ class Traps(Range):
     range_end = 70
     default = 50
 
-
 @dataclass
-class CKOptions(PerGameCommonOptions):
+class CCOptions(PerGameCommonOptions):
     advancement_goal: Goal
-
-
-ck_options: typing.Dict[str, type(Option)] = {
-    "advancement_goal":                     Goal,
-    "traps_percentage":                     Traps
-}
+    traps_percentage: Traps
