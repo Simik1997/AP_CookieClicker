@@ -68,9 +68,7 @@ class CookieClicker(World):
 
     # We got some games which leave some locations unfilled, so we need to fill them with some filler items
     def pre_fill(self):
-        missing_locs = len(self.multiworld.get_unfilled_locations()) - len(self.multiworld.itempool)
-        if missing_locs > 0:
-            self.multiworld.itempool += [self.create_filler() for _ in range(missing_locs)]
+        pass
 
     def create_filler(self) -> Item:
         name = random.choices(self.cookie_names, weights = self.cookie_weights, k = 1)[0]
