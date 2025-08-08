@@ -491,6 +491,17 @@ function receiveItem(id, firstTime) {
   }
 }
 
+function loadAchieveNum() {
+  let AchievementsNum = 0;
+  for (achieve in Game.Achievements) {
+    if (Game.Achievements[achieve].won === 1) {
+      AchievementsNum += 1;
+    }
+  }
+  console.log(AchievementsNum);
+  return AchievementsNum;
+}
+
 // Append functions which need to be set or overwritten after Connection during Runtime
 function appendFunctions() {
   //enable CookieClicker
@@ -553,7 +564,7 @@ function appendFunctions() {
           // Send AchievementID to AP
           sendCheckIdToAp(it.id + checkIdOffset);
 
-          if (Game.AchievementsOwned >= goalAchievementCount) {
+          if (loadAchieveNum() >= goalAchievementCount) {
             // TODO WIN COUNT?
             console.log("Win-condition met!");
             window.client.goal();
