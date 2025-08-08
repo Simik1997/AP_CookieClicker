@@ -297,6 +297,7 @@ function save() {
   localStorage.setItem("receivedItems", JSON.stringify(receivedItems));
   localStorage.setItem("host", hostname.value);
   localStorage.setItem("port", port.value);
+  if (port.value === "") localStorage.setItem("port", "38281"); //Handle blank port -> default port
   localStorage.setItem("name", name.value);
   localStorage.setItem("password", password.value);
 }
