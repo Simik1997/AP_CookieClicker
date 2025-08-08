@@ -181,13 +181,6 @@ function connectAP() {
   };
   const url = hostname.value + ":" + port.value;
 
-  const connectionOptions = {
-    url,
-    name: name.value,
-    game: gameName,
-    connectionInfo,
-  };
-
   // If connected
   window.client.socket.disconnect();
 
