@@ -8,6 +8,7 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=dashnet.org
 // @require
 // @grant        none
+// @top-level-await
 // ==/UserScript==
 
 const { Client, itemsHandlingFlags } = await import(
@@ -201,21 +202,21 @@ function connectAP() {
     console.log("Room update: ", packet);
   });
 
-  window.client.items.on("itemsReceived", (items) => {
-    console.log("Received Items: ", items);
+ window.client.socket.on("receivedItems", (packet) => {
+    console.log("Received Items: ", packet);
 
     // When items.length > 1 its an reconnect
-    if (items.length > 1) {
-      let serverItems = [];
+    if (packet.items.length > 1) {
+      const serverItems = [];
 
       // Execute Items with firstTime = false > only Unlocks, no Traps or Items
-      items.forEach((item) => {
-        receiveItem(item.id, false);
-        serverItems.push(item.id);
+      packet.items.forEach((item) => {
+        receiveItem(item.item, false);
+        serverItems.push(item.item);
       });
 
       // Compare serverItems with local saved (and executed Items)
-      let difference = serverItems.filter((x) => !receivedItems.includes(x));
+      const difference = serverItems.filter((x) => !receivedItems.includes(x));
       console.log("serverItems");
       console.log(serverItems);
 
@@ -230,7 +231,7 @@ function connectAP() {
       });
     } else {
       // Just one Item means its new > always use
-      receiveItem(items[0].id, true);
+      receiveItem(packet.items[0].item, true);
     }
   });
 
@@ -339,11 +340,11 @@ function randomProperty(obj) {
 // For this game we use the Games Chat, not the default Toast
 function toast(message) {
   Game.Notify("Archipelago", message);
-  /* 
+  /*
     Toastify({
         text: message,
         duration: 5000
-    }).showToast(); 
+    }).showToast();
     */
 }
 
