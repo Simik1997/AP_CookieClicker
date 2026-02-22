@@ -6,7 +6,7 @@ class Goal(Range):
     """Achievement Goal"""
     display_name = "Achievement Goal"
     range_start = 1
-    range_end = 639
+    range_end = 639 # TODO len(Locations) ?
     default = 100
 
 class Traps(Range):

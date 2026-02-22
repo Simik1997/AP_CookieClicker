@@ -110,8 +110,6 @@ def set_rules(self: "CookieClicker"):
 
     # TODO: Make sure there's logic, like not have the first check in-logic be "Bake 1 trevigintillion cookies in one ascension."
 
-    # 3) Standard completion check
-    def goal_achieved(state):
-        return len(state.prog_items[player]) >= self.options.advancement_goal.value
-
-    self.multiworld.completion_condition[player] = goal_achieved
+    # 3) Standard completion check. Due to AP limitations, the achievement count check is done client-side
+    #    and a special Victory item is unlocked if conditions are met
+    self.multiworld.completion_condition[player] = lambda state: state.has("Victory", self.player)

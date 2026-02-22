@@ -60,7 +60,6 @@ connect.onclick = function () {
   connectAP();
 };
 const text = document.createElement("span");
-let client = null; // After connection there will be a client
 
 connectionContainer.style.display = "flex";
 connectionContainer.style.margin = "0";
@@ -277,10 +276,10 @@ hostname.value = "archipelago.gg";
 /*                                   */
 /*                                   */
 
-var gameName = "Cookie Clicker";
+const gameName = "Cookie Clicker";
 let checkIdOffset = 42069001;
-let goalAchievementCount = 99;
-var receivedItems = [];
+let goalAchievementCount = 1000; // Default value prevent accidental goaling
+let receivedItems = [];
 
 /* On Site Loaded */
 // Disable CookieClicker
@@ -492,14 +491,8 @@ function receiveItem(id, firstTime) {
 }
 
 function loadAchieveNum() {
-  let AchievementsNum = 0;
-  for (achieve in Game.Achievements) {
-    if (Game.Achievements[achieve].won === 1) {
-      AchievementsNum += 1;
-    }
-  }
-  console.log(AchievementsNum);
-  return AchievementsNum;
+  // Game.AchievementsOwned does not include shadow achievements
+  return Object.values(Game.Achievements).filter(achv => achv.won).length;
 }
 
 // Append functions which need to be set or overwritten after Connection during Runtime
@@ -508,7 +501,8 @@ function appendFunctions() {
   document.getElementById("wrapper").style.visibility = "visible";
 
   //disable Buying of Upgrades
-  document.getElementById("upgrades").style.pointerEvents = "none";
+  //FIXME : some upgrades are not in the item pool and player should be able to buy them
+  //document.getElementById("upgrades").style.pointerEvents = "none";
 
   //lock all Stores
   document.getElementById("product0").style.display = "none";
@@ -565,8 +559,8 @@ function appendFunctions() {
           sendCheckIdToAp(it.id + checkIdOffset);
 
           if (loadAchieveNum() >= goalAchievementCount) {
-            // TODO WIN COUNT?
             console.log("Win-condition met!");
+            sendCheckIdToAp(42000000)
             window.client.goal();
           }
         }
