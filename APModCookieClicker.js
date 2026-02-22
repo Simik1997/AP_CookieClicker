@@ -11,9 +11,9 @@
 // @top-level-await
 // ==/UserScript==
 
-const { Client, itemsHandlingFlags } = await import(
+const {Client, itemsHandlingFlags} = await import(
   "https://unpkg.com/archipelago.js@2.0.4/dist/archipelago.min.js"
-);
+  );
 //'use strict';
 
 // TODO
@@ -147,6 +147,9 @@ function getPlayerId(map, searchValue) {
 
 function sendCheckIdToAp(id) {
   window.client.check(id);
+  // Essential to avoid discrepancies between AP server state and CC local save
+  // We could do a full check after each game load to sync both, with forced Game.Win/Game.RemoveAchiev
+  Game.WriteSave();
 }
 
 function releaseAll() {
@@ -194,7 +197,7 @@ function connectAP() {
     console.log("Room update: ", packet);
   });
 
- window.client.socket.on("receivedItems", (packet) => {
+  window.client.socket.on("receivedItems", (packet) => {
     console.log("Received Items: ", packet);
 
     // When items.length > 1 its an reconnect
@@ -233,7 +236,7 @@ function connectAP() {
   });
 
   window.client.socket.on("printJSON", (packet) => {
-    console.log("Print JSON: ", packet);
+    console.debug("Print JSON: ", packet);
     let msg = packetToText(packet.data);
     if (msg === "") {
       return;
@@ -277,7 +280,6 @@ hostname.value = "archipelago.gg";
 /*                                   */
 
 const gameName = "Cookie Clicker";
-let checkIdOffset = 42069001;
 let goalAchievementCount = 1000; // Default value prevent accidental goaling
 let receivedItems = [];
 
@@ -323,6 +325,7 @@ function load() {
     password.value ||
     "";
 }
+
 load();
 
 function randomProperty(obj) {
@@ -341,152 +344,180 @@ function toast(message) {
     */
 }
 
-function receiveItem(id, firstTime) {
-  let building = randomProperty(Game.Objects);
+const OFFSET = {
+  BUILDINGS: 10000000,
+  UPGRADES: 20000000,
+  FILLERS: 50000000,
+  TRAPS: 60000000
+}
+
+function receiveItem(itemId, firstTime) {
+  let building = randomProperty(Game.Objects); // FIXME should exclude locked buildings
 
   if (firstTime) {
-    receivedItems.push(id);
-    console.log("I apply a new item!" + id);
+    receivedItems.push(itemId);
+    console.log(`I apply a new item! ${itemId}`);
   }
 
   save();
 
-  // Cookie Multiplier
-  if (id === 42069644 && firstTime) {
-    Game.cookies = Game.cookies * 2;
-    console.log("*2 Cookies");
-  } else if (id === 42069645 && firstTime) {
-    Game.cookies = Game.cookies * 999;
-    console.log("*999 Cookies");
-  } else if (id === 42069646 && firstTime) {
-    Game.cookies = Game.cookies * 9999;
-    console.log("*9999 Cookies");
-  } else if (id === 42069647 && firstTime) {
-    Game.cookies = Game.cookies * 9999999;
-    console.log("*9999999 Cookies");
-  } else if (id === 42069648 && firstTime) {
-    Game.cookies = Game.cookies * 0.5;
-    console.log("*0.5 Cookies");
-  } else if (id === 42069465) {
-    // Unlock Cursor
-    document.getElementById("product0").style.display = "";
-  } else if (id === 42069466) {
-    // Unlock Farm
-    document.getElementById("product2").style.display = "";
-  } else if (id === 42069467) {
-    // Unlock Mine
-    document.getElementById("product3").style.display = "";
-  } else if (id === 42069468) {
-    // Unlock Factory
-    document.getElementById("product4").style.display = "";
-  } else if (id === 42069469) {
-    // Unlock Bank
-    document.getElementById("product5").style.display = "";
-  } else if (id === 42069470) {
-    // Unlock Temple
-    document.getElementById("product6").style.display = "";
-  } else if (id === 42069471) {
-    // Unlock Wizard Tower
-    document.getElementById("product7").style.display = "";
-  } else if (id === 42069472) {
-    // Unlock Shipment
-    document.getElementById("product8").style.display = "";
-  } else if (id === 42069473) {
-    // Unlock Alchemy Lab
-    document.getElementById("product9").style.display = "";
-  } else if (id === 42069474) {
-    // Unlock Portal
-    document.getElementById("product10").style.display = "";
-  } else if (id === 42069475) {
-    // Unlock Time Machine
-    document.getElementById("product11").style.display = "";
-  } else if (id === 42069476) {
-    // Unlock Antimatter Condenser
-    document.getElementById("product12").style.display = "";
-  } else if (id === 42069477) {
-    // Unlock Prism
-    document.getElementById("product13").style.display = "";
-  } else if (id === 42069478) {
-    // Unlock Chancemaker
-    document.getElementById("product14").style.display = "";
-  } else if (id === 42069479) {
-    // Unlock Fractal Engine
-    document.getElementById("product15").style.display = "";
-  } else if (id === 42069480) {
-    // Unlock Javascript Console
-    document.getElementById("product16").style.display = "";
-  } else if (id === 42069481) {
-    // Unlock Idleverse
-    document.getElementById("product17").style.display = "";
-  } else if (id === 42069482) {
-    // Unlock Cortex Baker
-    document.getElementById("product18").style.display = "";
-  } else if (id === 42069483) {
-    // Unlock You
-    document.getElementById("product19").style.display = "";
-  } else if (id < 42069649) {
-    // UPGRADES
-    Game.UpgradesById[id - checkIdOffset].basePrice = -1;
-    let success = Game.UpgradesById[id - checkIdOffset].buy();
+  const range = Math.floor(itemId / 10000000) * 10000000
+
+  if (range === OFFSET.FILLERS && firstTime) {
+    switch (itemId) {
+      case OFFSET.FILLERS + 0 :
+        Game.cookies *= 2;
+        console.log("*2 Cookies");
+        break;
+      case OFFSET.FILLERS + 1 :
+        Game.cookies *= 999;
+        console.log("*999 Cookies");
+        break;
+      case OFFSET.FILLERS + 2 :
+        Game.cookies *= 9999;
+        console.log("*9999 Cookies");
+        break;
+      case OFFSET.FILLERS + 3 :
+        Game.cookies *= 9999999;
+        console.log("*9999999 Cookies");
+        break;
+      case OFFSET.FILLERS + 4 :
+        Game.cookies *= 0.5;
+        console.log("*0.5 Cookies");
+        break;
+    }
+  }
+  if (range === OFFSET.BUILDINGS) {
+    switch (itemId) {
+      case OFFSET.BUILDINGS + 0 : // Unlock Cursor
+        document.getElementById("product0").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 1 : // Unlock Grandma
+        document.getElementById("product1").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 2 : // Unlock Farm
+        document.getElementById("product2").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 3 : // Unlock Mine
+        document.getElementById("product3").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 4 : // Unlock Factory
+        document.getElementById("product4").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 5 : // Unlock Bank
+        document.getElementById("product5").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 6 : // Unlock Temple
+        document.getElementById("product6").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 7 : // Unlock Wizard Tower
+        document.getElementById("product7").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 8 : // Unlock Shipment
+        document.getElementById("product8").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 9 : // Unlock Alchemy Lab
+        document.getElementById("product9").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 10 : // Unlock Portal
+        document.getElementById("product10").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 11 : // Unlock Time Machine
+        document.getElementById("product11").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 12 : // Unlock Antimatter Condenser
+        document.getElementById("product12").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 13 : // Unlock Prism
+        document.getElementById("product13").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 14 : // Unlock Chancemaker
+        document.getElementById("product14").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 15 : // Unlock Fractal Engine
+        document.getElementById("product15").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 16 : // Unlock Javascript Console
+        document.getElementById("product16").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 17 : // Unlock Idleverse
+        document.getElementById("product17").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 18 : // Unlock Cortex Baker
+        document.getElementById("product18").style.display = "";
+        break;
+      case OFFSET.BUILDINGS + 19 : // Unlock You
+        document.getElementById("product19").style.display = "";
+        break;
+    }
+  }
+  if (range === OFFSET.UPGRADES) {
+    const upgradeId = itemId - OFFSET.UPGRADES - 1;
+    Game.UpgradesById[upgradeId].basePrice = -1;
+    let success = Game.UpgradesById[upgradeId].buy();
     if (success !== 1) {
       // If there is no buy function, set it to bought manually
-      Game.UpgradesById[id - checkIdOffset].bought = 1;
+      Game.UpgradesById[upgradeId].bought = 1;
     }
-    // TRAPS
-  } else if (id === 42069649 && firstTime) {
-    if (building.amount >= 1) {
-      building.amount -= 1;
-    } else {
-      building.amount = 0;
+  }
+  if (range === OFFSET.TRAPS && firstTime) {
+    switch (itemId) {
+      case OFFSET.TRAPS + 0 :
+        building.amount = Math.max(building.amount - 1, 0);
+        Game.Notify("Archipelago", "-1 " + building.name);
+        console.log("-1 Building");
+        break;
+      case OFFSET.TRAPS + 1 :
+        building.amount = Math.max(building.amount - 10, 0);
+        Game.Notify("Archipelago", "-10 " + building.name);
+        console.log("-10 Building");
+        break;
+      case OFFSET.TRAPS + 2 :
+        building.amount = Math.max(building.amount - 100, 0);
+        Game.Notify("Archipelago", "-100 " + building.name);
+        console.log("-100 Building");
+        break;
+      case OFFSET.TRAPS + 3 :
+        Game.cookies *= 0.9;
+        console.log("-10% Cookies");
+        break;
+      case OFFSET.TRAPS + 4 :
+        Game.cookies *= 0.8;
+        console.log("-20% Cookies");
+        break;
+      case OFFSET.TRAPS + 5 :
+        Game.cookies *= 0.7;
+        console.log("-30% Cookies");
+        break;
+      case OFFSET.TRAPS + 6 :
+        Game.cookies *= 0.6;
+        console.log("-40% Cookies");
+        break;
+      case OFFSET.TRAPS + 7 :
+        Game.cookies *= 0.5;
+        console.log("-50% Cookies");
+        break;
+      case OFFSET.TRAPS + 8 :
+        Game.cookies *= 0.4;
+        console.log("-60% Cookies");
+        break;
+      case OFFSET.TRAPS + 9 :
+        Game.cookies *= 0.3;
+        console.log("-70% Cookies");
+        break;
+      case OFFSET.TRAPS + 10 :
+        Game.cookies *= 0.2;
+        console.log("-80% Cookies");
+        break;
+      case OFFSET.TRAPS + 11 :
+        Game.cookies *= 0.1;
+        console.log("-90% Cookies");
+        break;
+      case OFFSET.TRAPS + 12 :
+        Game.cookies = 0;
+        console.log("-100% Cookies");
+        break;
     }
-    Game.Notify("Archipelago", "-1 " + building.name);
-    console.log("-1 Building");
-  } else if (id === 42069650 && firstTime) {
-    if (building.amount >= 10) {
-      building.amount -= 10;
-    } else {
-      building.amount = 0;
-    }
-    Game.Notify("Archipelago", "-10 " + building.name);
-    console.log("-10 Building");
-  } else if (id === 42069651 && firstTime) {
-    if (building.amount >= 100) {
-      building.amount -= 100;
-    } else {
-      building.amount = 0;
-    }
-    Game.Notify("Archipelago", "-100 " + building.name);
-    console.log("-100 Building");
-  } else if (id === 42069652 && firstTime) {
-    Game.cookies = Game.cookies * 0.9;
-    console.log("-10% Cookies");
-  } else if (id === 42069653 && firstTime) {
-    Game.cookies = Game.cookies * 0.8;
-    console.log("-20% Cookies");
-  } else if (id === 42069654 && firstTime) {
-    Game.cookies = Game.cookies * 0.7;
-    console.log("-30% Cookies");
-  } else if (id === 42069655 && firstTime) {
-    Game.cookies = Game.cookies * 0.6;
-    console.log("-40% Cookies");
-  } else if (id === 42069656 && firstTime) {
-    Game.cookies = Game.cookies * 0.5;
-    console.log("-50% Cookies");
-  } else if (id === 42069657 && firstTime) {
-    Game.cookies = Game.cookies * 0.4;
-    console.log("-60% Cookies");
-  } else if (id === 42069658 && firstTime) {
-    Game.cookies = Game.cookies * 0.3;
-    console.log("-70% Cookies");
-  } else if (id === 42069659 && firstTime) {
-    Game.cookies = Game.cookies * 0.2;
-    console.log("-80% Cookies");
-  } else if (id === 42069660 && firstTime) {
-    Game.cookies = Game.cookies * 0.1;
-    console.log("-90% Cookies");
-  } else if (id === 42069661 && firstTime) {
-    Game.cookies = 0;
-    console.log("-100% Cookies");
   }
 }
 
@@ -542,23 +573,25 @@ function appendFunctions() {
           Game.Notify(
             loc("Achievement unlocked"),
             '<div class="title" style="font-size:18px;margin-top:-2px;">' +
-              name +
-              "</div>",
+            name +
+            "</div>",
             it.icon,
           );
           Game.NotifyTooltip(
             "function(){return Game.crateTooltip(Game.AchievementsById[" +
-              it.id +
-              "]);}",
+            it.id +
+            "]);}",
           );
           if (Game.CountsAsAchievementOwned(it.pool)) Game.AchievementsOwned++;
           Game.recalculateGains = 1;
           if (App && it.vanilla) App.gotAchiev(it.id);
 
           // Send AchievementID to AP
+          const checkIdOffset = 42069001
           sendCheckIdToAp(it.id + checkIdOffset);
 
-          if (loadAchieveNum() >= goalAchievementCount) {
+          const gameWon = window.client.items.received.some(i => i.id === 42000000)
+          if (!gameWon && loadAchieveNum() >= goalAchievementCount) {
             console.log("Win-condition met!");
             sendCheckIdToAp(42000000)
             window.client.goal();
@@ -586,7 +619,7 @@ function appendFunctions() {
     if (Game.hasBuff("Cookie storm") && Math.random() < 0.5) {
       var newShimmer = new Game.shimmer(
         "golden",
-        { type: "cookie storm drop" },
+        {type: "cookie storm drop"},
         1,
       );
       newShimmer.dur = Math.ceil(Math.random() * 4 + 1);
@@ -629,10 +662,10 @@ function appendFunctions() {
     if (!bypass)
       Game.Prompt(
         "<id Reincarnate><h3>" +
-          loc("Reincarnate") +
-          '</h3><div class="block">' +
-          loc("Are you ready to return to the mortal world?") +
-          "</div>",
+        loc("Reincarnate") +
+        '</h3><div class="block">' +
+        loc("Are you ready to return to the mortal world?") +
+        "</div>",
         [[loc("Yes"), "Game.ClosePrompt();Game.Reincarnate(1);"], loc("No")],
       );
     else {
