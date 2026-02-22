@@ -13,7 +13,7 @@ from .Rules import set_rules
 
 class CookieClicker(World):
     game = "Cookie Clicker"
-    worldversion = "0.5.0"
+    worldversion = "0.6.0"
     location_name_to_id = location_table
     options_dataclass = CCOptions
     options: CCOptions
