@@ -13,7 +13,7 @@ from .Rules import set_rules
 
 class CookieClicker(World):
     game = "Cookie Clicker"
-    worldversion = "0.5.0"
+    worldversion = "0.6.0"
     location_name_to_id = location_table
     options_dataclass = CCOptions
     options: CCOptions
@@ -26,12 +26,18 @@ class CookieClicker(World):
     def create_regions(self):
         region = Region("Menu", self.player, self.multiworld)
         self.multiworld.regions.append(region)
+
         achievement_region = Region("Achievements Region", self.player, self.multiworld)
         self.multiworld.regions.append(achievement_region)
         for location in location_table:
             achievement_region.add_locations({ f"{location}":self.location_name_to_id[location]}, CCLocation)
         # Just one region for now, but we should add more later for sanity checks
         region.connect(achievement_region, "Achievements")
+
+        # Special virtual item (event) to check victory. Think of it as a flag item
+        event_location = CCLocation(self.player, "Victory location", 42000000, achievement_region)
+        event_location.place_locked_item(CCItem("Victory", ItemClassification.progression, 42000000, self.player))
+        achievement_region.locations.append(event_location)
 
     def create_item(self, name: str) -> CCItem:
         item_data = item_table.get(name)
